@@ -27,6 +27,9 @@ const jobSchema = new Schema(
         rawDescription: {
             type: String,
         },
+        markdownDescription: {
+            type: String,
+        },
         preprocessedDescription: {
             type: String,
         },
