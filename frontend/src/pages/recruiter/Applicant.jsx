@@ -95,7 +95,7 @@ export default function Applicant() {
           <aside className="rounded-3xl bg-white p-8 shadow-sm border border-gray-100 space-y-6">
             <div className="rounded-3xl bg-teal-50 p-6">
               <div className="flex items-center gap-3 text-teal-700 font-semibold mb-3">
-                <BriefcaseSearch size={18} /> Application overview
+                {/* <BriefcaseSearch size={18} /> Application overview */}
               </div>
               <p className="text-gray-600">Use this section to decide whether to move the candidate to the next interview round.</p>
             </div>
