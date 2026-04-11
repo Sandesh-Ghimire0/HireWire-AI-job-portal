@@ -38,10 +38,10 @@ const getJobDescription = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Job ID is required");
     }
 
-    const description = await JobService.getJobDescription(jobId);
+    const job = await JobService.getJobDescription(jobId);
 
     return res.status(200).json(
-        new ApiResponse(200, { markdownDescription: description }, "Job description fetched successfully")
+        new ApiResponse(200, job, "Job details fetched successfully")
     );
 });
 

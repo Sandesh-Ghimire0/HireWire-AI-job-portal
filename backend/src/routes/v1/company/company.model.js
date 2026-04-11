@@ -12,6 +12,11 @@ const companySchema = new Schema(
             required: [true, "Company name is required"],
             trim: true,
         },
+        location: {
+            type: String,
+            required: [true, "Company location is required"],
+            trim: true,
+        },
         website: {
             type: String,
             trim: true,

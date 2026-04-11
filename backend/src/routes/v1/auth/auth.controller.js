@@ -25,10 +25,12 @@ const loginUser = asyncHandler(async (req, res) => {
                 200,
                 {
                     user,
+                    accessToken,
                 },
                 "User logged in successfully"
             )
         );
+
 });
 
 export { loginUser };

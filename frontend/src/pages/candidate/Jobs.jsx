@@ -1,62 +1,48 @@
-import { useState } from 'react'
-import { Search } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Search, Loader2 } from 'lucide-react'
 import Sidebar from '../../components/common/Sidebar'
 import JobCard from '../../components/candidate/JobCard'
-
-const mockJobs = [
-  {
-    id: 1,
-    title: 'Frontend Developer',
-    company: 'TechCorp',
-    location: 'Kathmandu',
-    type: 'Full-time',
-    posted: '2d ago',
-    matchScore: 92,
-    skills: ['React', 'Tailwind', 'JavaScript'],
-  },
-  {
-    id: 2,
-    title: 'UI/UX Designer',
-    company: 'DesignHub',
-    location: 'Remote',
-    type: 'Part-time',
-    posted: '1d ago',
-    matchScore: 78,
-    skills: ['Figma', 'CSS', 'Prototyping'],
-  },
-  {
-    id: 3,
-    title: 'React Developer',
-    company: 'StartupX',
-    location: 'Lalitpur',
-    type: 'Full-time',
-    posted: '3d ago',
-    matchScore: 85,
-    skills: ['React', 'Node.js', 'MongoDB'],
-  },
-  {
-    id: 4,
-    title: 'Backend Engineer',
-    company: 'ScaleLabs',
-    location: 'Kathmandu',
-    type: 'Remote',
-    posted: '5d ago',
-    matchScore: 81,
-    skills: ['Node.js', 'Express', 'PostgreSQL'],
-  },
-]
+import { getAllJobs } from '../../api/job'
 
 export default function Jobs() {
+  const [jobs, setJobs] = useState([])
+  const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState('')
 
-  const filteredJobs = mockJobs.filter((job) => {
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await getAllJobs()
+        setJobs(response.data)
+      } catch (error) {
+        console.error('Error fetching jobs:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchJobs()
+  }, [])
+
+  const filteredJobs = jobs.filter((job) => {
     const search = query.toLowerCase()
     return (
       job.title.toLowerCase().includes(search) ||
-      job.company.toLowerCase().includes(search) ||
-      job.location.toLowerCase().includes(search)
+      job.companyId?.name?.toLowerCase().includes(search) ||
+      job.level?.toLowerCase().includes(search)
     )
   })
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <Sidebar role="candidate" />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="animate-spin text-teal-500" size={32} />
+        </main>
+      </div>
+    )
+  }
+
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -83,7 +69,7 @@ export default function Jobs() {
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filteredJobs.map((job) => (
-            <JobCard key={job.id} job={job} />
+            <JobCard key={job._id} job={job} />
           ))}
           {filteredJobs.length === 0 && (
             <div className="col-span-full rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-gray-500">

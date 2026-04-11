@@ -1,77 +1,45 @@
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, MapPin, Briefcase, Clock, ShieldCheck, Layers } from 'lucide-react'
+import { ArrowLeft, MapPin, Briefcase, Clock, ShieldCheck, Layers, Loader2 } from 'lucide-react'
 import Sidebar from '../../components/common/Sidebar'
 import MatchScoreBadge from '../../components/candidate/MatchScoreBadge'
+import { getJobDescription } from '../../api/job'
+import ReactMarkdown from 'react-markdown'
+import { formatDistanceToNow } from 'date-fns'
 
-const mockJobs = [
-  {
-    id: 1,
-    title: 'Frontend Developer',
-    company: 'TechCorp',
-    location: 'Kathmandu',
-    type: 'Full-time',
-    posted: '2d ago',
-    matchScore: 92,
-    skills: ['React', 'Tailwind', 'JavaScript'],
-    summary: 'Build responsive web apps and collaborate with product teams to convert designs into fast, accessible interfaces.',
-    responsibilities: [
-      'Develop reusable UI components with React.',
-      'Translate wireframes into polished web experiences.',
-      'Work with designers and backend engineers on feature delivery.',
-    ],
-    requirements: [
-      '2+ years of frontend development experience.',
-      'Strong knowledge of React and modern JavaScript.',
-      'Familiarity with REST APIs and version control.',
-    ],
-  },
-  {
-    id: 2,
-    title: 'UI/UX Designer',
-    company: 'DesignHub',
-    location: 'Remote',
-    type: 'Part-time',
-    posted: '1d ago',
-    matchScore: 78,
-    skills: ['Figma', 'CSS', 'Prototyping'],
-    summary: 'Design intuitive interfaces and craft delightful experiences for a remote-first product team.',
-    responsibilities: [
-      'Create wireframes, prototypes, and UI concepts.',
-      'Collaborate with product and engineering stakeholders.',
-      'Conduct usability tests and iterate on designs.',
-    ],
-    requirements: [
-      'Portfolio of web/mobile design work.',
-      'Experience with Figma or Sketch.',
-      'Strong communication and presentation skills.',
-    ],
-  },
-  {
-    id: 3,
-    title: 'React Developer',
-    company: 'StartupX',
-    location: 'Lalitpur',
-    type: 'Full-time',
-    posted: '3d ago',
-    matchScore: 85,
-    skills: ['React', 'Node.js', 'MongoDB'],
-    summary: 'Deliver scalable React applications and support backend integration with Node.js services.',
-    responsibilities: [
-      'Implement UI features using React.',
-      'Optimize applications for performance and responsiveness.',
-      'Partner with backend engineers on API design.',
-    ],
-    requirements: [
-      'Experience building React applications.',
-      'Comfort with hooks, state management, and testing.',
-      'Knowledge of HTML, CSS, and frontend architecture.',
-    ],
-  },
-]
+
+
 
 export default function JobDetail() {
   const { id } = useParams()
-  const job = mockJobs.find((item) => String(item.id) === id)
+  const [job, setJob] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchJob = async () => {
+      try {
+        const response = await getJobDescription(id)
+        setJob(response.data)
+      } catch (error) {
+        console.error('Error fetching job details:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchJob()
+  }, [id])
+
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <Sidebar role="candidate" />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="animate-spin text-teal-500" size={32} />
+        </main>
+      </div>
+    )
+  }
 
   if (!job) {
     return (
@@ -90,6 +58,7 @@ export default function JobDetail() {
     )
   }
 
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar role="candidate" />
@@ -102,44 +71,32 @@ export default function JobDetail() {
                 <ArrowLeft size={16} /> Back to jobs
               </Link>
               <h1 className="mt-4 text-3xl font-bold text-[#1A2B4A]">{job.title}</h1>
-              <p className="text-gray-500 mt-2">{job.company} · {job.location} · {job.type}</p>
+              <p className="text-gray-500 mt-2">{job.companyId?.name} · {job.salaryRange || 'N/A'} · {job.type}</p>
             </div>
-            <MatchScoreBadge score={job.matchScore} />
+            <MatchScoreBadge score={job.matchScore || 0} />
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+          <div className="grid items-start gap-6 lg:grid-cols-[1.6fr_1fr]">
             <section className="rounded-3xl bg-white p-8 shadow-sm border border-gray-100">
               <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
-                <span className="inline-flex items-center gap-2"><MapPin size={16} /> {job.location}</span>
+                <span className="inline-flex items-center gap-2"><MapPin size={16} /> {job.level || 'Any Level'}</span>
                 <span className="inline-flex items-center gap-2"><Briefcase size={16} /> {job.type}</span>
-                <span className="inline-flex items-center gap-2"><Clock size={16} /> {job.posted}</span>
+                <span className="inline-flex items-center gap-2"><Clock size={16} /> {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}</span>
+
               </div>
 
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-lg font-semibold text-[#1A2B4A] mb-3">Job summary</h2>
-                  <p className="text-gray-600 leading-relaxed">{job.summary}</p>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold text-[#1A2B4A] mb-3">Responsibilities</h3>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    {job.responsibilities.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold text-[#1A2B4A] mb-3">Requirements</h3>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    {job.requirements.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
+                  <div className="prose text-gray-600 leading-relaxed">
+                    <ReactMarkdown>
+                      {job.markdownDescription || job.rawDescription}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               </div>
             </section>
+
+
 
             <aside className="rounded-3xl bg-white p-8 shadow-sm border border-gray-100 space-y-6">
               <div className="space-y-2">
@@ -160,11 +117,11 @@ export default function JobDetail() {
                   <Layers size={18} /> Preferred skills
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {job.skills.map((skill) => (
+                  {/* {job.skills.map((skill) => (
                     <span key={skill} className="rounded-full bg-white px-3 py-2 text-xs font-medium text-slate-700 border border-slate-200">
                       {skill}
                     </span>
-                  ))}
+                  ))} */}
                 </div>
               </div>
 

@@ -1,12 +1,31 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
-const useAuthStore = create((set) => ({
-  user: null,
-  role: null, // 'candidate' | 'recruiter'
-  token: null,
+export const useAuthStore = create(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      isAuthenticated: false,
 
-  login: (user, role, token) => set({ user, role, token }),
-  logout: () => set({ user: null, role: null, token: null }),
-}))
+      setAuth: (user, token) => {
+        set({ user, token, isAuthenticated: !!user })
+        if (token) {
+          localStorage.setItem('token', token)
+        } else {
+          localStorage.removeItem('token')
+        }
+      },
+
+      logout: () => {
+        set({ user: null, token: null, isAuthenticated: false })
+        localStorage.removeItem('token')
+      },
+    }),
+    {
+      name: 'auth-storage',
+    }
+  )
+)
 
 export default useAuthStore

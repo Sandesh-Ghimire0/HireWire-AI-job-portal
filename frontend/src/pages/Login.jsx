@@ -1,16 +1,41 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
-export default function Login() {
-  const [role, setRole] = useState('candidate')
-  const [form, setForm] = useState({ email: '', password: '' })
-  const navigate = useNavigate()
+import useAuthStore from '../store/authstore'
+import { loginUser } from '../api/auth'
+import toast from 'react-hot-toast'
 
-  const handleSubmit = (e) => {
+export default function Login() {
+  const [form, setForm] = useState({ email: '', password: '' })
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const setAuth = useAuthStore(state => state.setAuth)
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: connect to backend
-    navigate(role === 'candidate' ? '/candidate/dashboard' : '/recruiter/dashboard')
+    setLoading(true)
+    try {
+      const response = await loginUser(form)
+      const { user, accessToken } = response.data
+      
+      setAuth(user, accessToken)
+      toast.success('Login successful!')
+
+      // Navigate based on role
+      if (user.role === 'CANDIDATE') {
+        navigate('/candidate/dashboard')
+      } else if (user.role === 'COMPANY') {
+        navigate('/recruiter/dashboard')
+      } else {
+        navigate('/')
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Login failed')
+    } finally {
+      setLoading(false)
+    }
   }
+
 
   return (
     <div className="min-h-screen bg-[#3d60a1] flex items-center justify-center px-4">
@@ -18,19 +43,6 @@ export default function Login() {
         <h2 className="text-2xl font-bold text-[#89a3d3] mb-2">Welcome Back</h2>
         <p className="text-gray-400 text-sm mb-6">Log in to your HireWire account</p>
 
-        {/* Role Toggle */}
-        <div className="flex bg-gray-100 rounded-full p-1 mb-6">
-          {['candidate', 'recruiter'].map(r => (
-            <button
-              key={r}
-              onClick={() => setRole(r)}
-              className={`flex-1 py-2 rounded-full text-sm font-medium transition
-                ${role === r ? 'bg-[#314f86] text-white' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              {r === 'candidate' ? 'Job Seeker' : 'Recruiter'}
-            </button>
-          ))}
-        </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
@@ -51,10 +63,12 @@ export default function Login() {
           />
           <button
             type="submit"
-            className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 rounded-lg transition"
+            disabled={loading}
+            className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Log In
+            {loading ? 'Logging in...' : 'Log In'}
           </button>
+
         </form>
 
         <p className="text-center text-sm text-gray-400 mt-4">

@@ -35,7 +35,7 @@ class JobService {
         if (!job) {
             throw new ApiError(404, "Job not found");
         }
-        return job.markdownDescription;
+        return job;
     }
 
     async getAllJobs() {

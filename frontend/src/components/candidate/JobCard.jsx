@@ -1,38 +1,61 @@
 import { Link } from 'react-router-dom'
-import { MapPin, Clock, Briefcase } from 'lucide-react'
+import { MapPin, Clock, Briefcase, DollarSign, Layers } from 'lucide-react'
 import MatchScoreBadge from './MatchScoreBadge'
+import { formatDistanceToNow } from 'date-fns'
 
 export default function JobCard({ job }) {
+  const company = job.companyId || {}
+
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition">
-      <div className="flex justify-between items-start mb-3">
-        <div>
-          <h3 className="font-semibold text-[#1A2B4A] text-base">{job.title}</h3>
-          <p className="text-sm text-gray-500">{job.company}</p>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all group">
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex gap-4">
+          <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100">
+            {company.logo ? (
+              <img src={company.logo} alt={company.name} className="w-full h-full object-cover" />
+            ) : (
+              <Briefcase className="text-gray-300" size={24} />
+            )}
+          </div>
+          <div>
+            <h3 className="font-bold text-[#1A2B4A] text-lg group-hover:text-teal-600 transition-colors">{job.title}</h3>
+            <p className="text-sm text-gray-500 font-medium">{company.name || 'Unknown Company'}</p>
+          </div>
         </div>
-        <MatchScoreBadge score={job.matchScore} />
+        <MatchScoreBadge score={job.matchScore || 0} />
       </div>
 
-      <div className="flex flex-wrap gap-3 text-xs text-gray-400 mb-4">
-        <span className="flex items-center gap-1"><MapPin size={12} /> {job.location}</span>
-        <span className="flex items-center gap-1"><Briefcase size={12} /> {job.type}</span>
-        <span className="flex items-center gap-1"><Clock size={12} /> {job.posted}</span>
+      <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-6">
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <MapPin size={14} className="text-teal-500" />
+          <span>{company.location || 'Remote'}</span>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <Briefcase size={14} className="text-teal-500" />
+          <span>{job.type}</span>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <Layers size={14} className="text-teal-500" />
+          <span>{job.level || 'Any Level'}</span>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <Clock size={14} className="text-teal-500" />
+          <span>{formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}</span>
+        </div>
       </div>
 
-      <div className="flex gap-2 flex-wrap mb-4">
-        {job.skills?.slice(0, 3).map(skill => (
-          <span key={skill} className="bg-teal-50 text-teal-700 text-xs px-2 py-1 rounded-full">
-            {skill}
-          </span>
-        ))}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+        <div className="flex items-center gap-1 text-teal-600 font-semibold text-sm">
+          <DollarSign size={14} />
+          {job.salaryRange || 'Competitive'}
+        </div>
+        <Link
+          to={`/candidate/jobs/${job._id}`}
+          className="px-4 py-2 bg-[#1A2B4A] text-white text-xs font-bold rounded-xl hover:bg-teal-600 transition-colors"
+        >
+          Details
+        </Link>
       </div>
-
-      <Link
-        to={`/candidate/jobs/${job.id}`}
-        className="block text-center bg-[#1A2B4A] text-white text-sm py-2 rounded-lg hover:bg-teal-600 transition"
-      >
-        View Job
-      </Link>
     </div>
   )
 }
