@@ -10,13 +10,20 @@ export default function JobCard({ job }) {
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all group">
       <div className="flex justify-between items-start mb-4">
         <div className="flex gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100">
+
+          {/* Logo box — object-contain so full logo is visible, p-1.5 inner padding */}
+          <div className="w-14 h-14 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100 shrink-0">
             {company.logo ? (
-              <img src={company.logo} alt={company.name} className="w-full h-full object-cover" />
+              <img
+                src={company.logo}
+                alt={company.name}
+                className="w-full h-full object-contain p-1.5"
+              />
             ) : (
               <Briefcase className="text-gray-300" size={24} />
             )}
           </div>
+
           <div>
             <h3 className="font-bold text-[#1A2B4A] text-lg group-hover:text-teal-600 transition-colors">{job.title}</h3>
             <p className="text-sm text-gray-500 font-medium">{company.name || 'Unknown Company'}</p>

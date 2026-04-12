@@ -1,11 +1,12 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Briefcase, FileText,
-  PlusCircle, Users
+  PlusCircle, Users, LogOut
 } from 'lucide-react'
 
 export default function Sidebar({ role }) {
   const location = useLocation()
+  const navigate = useNavigate()
 
   const candidateLinks = [
     { to: '/candidate/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -21,10 +22,20 @@ export default function Sidebar({ role }) {
 
   const links = role === 'recruiter' ? recruiterLinks : candidateLinks
 
+  const handleLogout = () => {
+    // Clear auth state here (localStorage, zustand store, etc.)
+    localStorage.removeItem('token')
+    navigate('/login')
+  }
+
   return (
-    <aside className="w-60 min-h-screen bg-[#1A2B4A] text-white flex flex-col py-8 px-4">
+    // sticky top-0 h-screen keeps sidebar fixed while page scrolls
+    <aside className="sticky top-0 h-screen w-60 bg-[#1A2B4A] text-white flex flex-col py-8 px-4 shrink-0">
+      {/* Logo */}
       <h1 className="text-2xl font-bold text-teal-400 mb-10 px-2">HireWire</h1>
-      <nav className="flex flex-col gap-2">
+
+      {/* Nav Links */}
+      <nav className="flex flex-col gap-2 flex-1">
         {links.map(({ to, label, icon: Icon }) => (
           <Link
             key={to}
@@ -39,6 +50,17 @@ export default function Sidebar({ role }) {
           </Link>
         ))}
       </nav>
+
+      {/* Logout Button — pinned to bottom */}
+      <div className="border-t border-white/10 pt-4 mt-4">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition"
+        >
+          <LogOut size={18} />
+          Logout
+        </button>
+      </div>
     </aside>
   )
 }
