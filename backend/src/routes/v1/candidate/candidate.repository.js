@@ -13,6 +13,11 @@ class CandidateRepository {
     async createCandidate(candidateData) {
         return await Candidate.create(candidateData);
     }
+
+    async findByUserId(userId) {
+        return await Candidate.findOne({ userId }).populate("userId");
+    }
 }
+
 
 export default new CandidateRepository();

@@ -1,5 +1,8 @@
-import { useState } from 'react'
-import { X, ChevronRight, ChevronLeft, CheckCircle, Upload, User, Phone, Mail, MapPin, Briefcase } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import { X, ChevronRight, ChevronLeft, CheckCircle, Upload, User, Phone, Mail, MapPin, Briefcase, FileText, Loader2 } from 'lucide-react'
+import { getCandidateProfile } from '../../api/candidate'
+import { submitApplication } from '../../api/application'
 
 // ─── Step Components ──────────────────────────────────────────────────────────
 
@@ -133,36 +136,76 @@ function StepExperience({ data, onChange }) {
   )
 }
 
-function StepResume({ data, onChange }) {
+function StepResume({ data, onChange, existingCv }) {
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) onChange({ ...data, file, fileName: file.name })
+  }
+
+  const getDisplayName = () => {
+    if (data.fileName) return data.fileName
+    if (existingCv) return "Current Resume (click to view)"
+    return null
   }
 
   return (
     <div className="flex flex-col gap-4">
       <h3 className="font-semibold text-[#1A2B4A] text-sm uppercase tracking-wide">Resume & Cover Letter</h3>
 
-      {/* Resume Upload */}
+      {/* Resume Upload / Display */}
       <div className="flex flex-col gap-1">
         <label className="text-xs font-medium text-gray-500">Resume (PDF) *</label>
-        <label className="border-2 border-dashed border-teal-300 rounded-xl p-6 flex flex-col items-center gap-2 cursor-pointer hover:bg-teal-50 transition">
-          <Upload size={24} className="text-teal-500" />
-          <span className="text-sm text-gray-500">
-            {data.fileName ? (
-              <span className="text-teal-600 font-medium">{data.fileName}</span>
-            ) : (
-              <>Click to upload or drag & drop</>
-            )}
-          </span>
-          <span className="text-xs text-gray-400">PDF only, max 5MB</span>
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-        </label>
+        
+        {existingCv && !data.file ? (
+          <div className="flex flex-col gap-3">
+             <a 
+              href={existingCv} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 p-4 border border-teal-200 bg-teal-50 rounded-xl hover:bg-teal-100 transition group"
+            >
+              <div className="bg-teal-500 p-2 rounded-lg text-white group-hover:scale-110 transition">
+                <FileText size={20} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-teal-700 truncate">Current Resume</p>
+                <p className="text-xs text-teal-600/70">Click to open in new tab</p>
+              </div>
+              <ChevronRight size={18} className="text-teal-400" />
+            </a>
+            
+            {/* <label className="text-xs font-medium text-gray-400 text-center">OR</label>
+            
+            <label className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-gray-50 transition">
+              <Upload size={18} className="text-gray-400" />
+              <span className="text-xs text-gray-500">Upload new resume to replace</span>
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label> */}
+          </div>
+        ) : (
+          <label className="border-2 border-dashed border-teal-300 rounded-xl p-6 flex flex-col items-center gap-2 cursor-pointer hover:bg-teal-50 transition">
+            <Upload size={24} className="text-teal-500" />
+            <span className="text-sm text-gray-500">
+              {data.fileName ? (
+                <span className="text-teal-600 font-medium">{data.fileName}</span>
+              ) : (
+                <>Click to upload or drag & drop</>
+              )}
+            </span>
+            <span className="text-xs text-gray-400">PDF only, max 5MB</span>
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </label>
+        )}
       </div>
 
       {/* ATS Score Preview */}
@@ -244,10 +287,35 @@ function ProgressBar({ current, total }) {
 export default function EasyApplyModal({ job, onClose }) {
   const [step, setStep] = useState(0)
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   const [contactData, setContactData] = useState({ name: '', email: '', phone: '', location: '' })
   const [expData, setExpData] = useState({ experience: '', lastTitle: '', notice: '', salary: '' })
   const [resumeData, setResumeData] = useState({ file: null, fileName: '', coverLetter: '' })
+  const [existingCv, setExistingCv] = useState(null)
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await getCandidateProfile()
+        if (response.success && response.data) {
+          const profile = response.data
+          setContactData(prev => ({
+            ...prev,
+            name: profile.fullName || '',
+            // Email might be in profile.userId.email if populated, 
+            // but let's assume it's available or leave as is if not.
+            email: profile.userId?.email || prev.email || ''
+          }))
+          setExistingCv(profile.cvLink)
+        }
+      } catch (error) {
+        console.error("Failed to fetch candidate profile:", error)
+      }
+    }
+    fetchProfile()
+  }, [])
 
   const totalSteps = 3
 
@@ -256,15 +324,38 @@ export default function EasyApplyModal({ job, onClose }) {
     else handleSubmit()
   }
 
-  const handleSubmit = () => {
-    // TODO: POST to backend with formData
-    setSubmitted(true)
+  const { id: jobIdFromUrl } = useParams()
+
+  const handleSubmit = async () => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const payload = {
+        jobId: job?._id || jobIdFromUrl,
+        ...contactData,
+        ...expData,
+        coverLetter: resumeData.coverLetter
+      }
+
+      const response = await submitApplication(payload)
+      if (response.success) {
+        setSubmitted(true)
+      } else {
+        setError(response.message || "Something went wrong. Please try again.")
+      }
+    } catch (err) {
+      console.error("Application submission error:", err)
+      setError(err.response?.data?.message || "Failed to submit application. Please check your connection.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   const canProceed = () => {
     if (step === 0) return contactData.name && contactData.email && contactData.phone && contactData.location
     if (step === 1) return expData.experience
-    if (step === 2) return resumeData.file !== null
+    if (step === 2) return resumeData.file !== null || existingCv !== null
     return true
   }
 
@@ -295,10 +386,15 @@ export default function EasyApplyModal({ job, onClose }) {
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {!submitted ? (
             <>
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-100 text-red-600 text-xs rounded-lg animate-in fade-in slide-in-from-top-2">
+                  {error}
+                </div>
+              )}
               <ProgressBar current={step} total={totalSteps} />
               {step === 0 && <StepContact data={contactData} onChange={setContactData} />}
               {step === 1 && <StepExperience data={expData} onChange={setExpData} />}
-              {step === 2 && <StepResume data={resumeData} onChange={setResumeData} />}
+              {step === 2 && <StepResume data={resumeData} onChange={setResumeData} existingCv={existingCv} />}
             </>
           ) : (
             <StepSuccess jobTitle={job?.title} company={job?.company} />
@@ -316,14 +412,23 @@ export default function EasyApplyModal({ job, onClose }) {
               <ChevronLeft size={16} /> Back
             </button>
             <span className="text-xs text-gray-300">Step {step + 1} of {totalSteps}</span>
-            <button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="flex items-center gap-1 bg-teal-500 hover:bg-teal-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-2.5 rounded-full transition"
-            >
-              {step === totalSteps - 1 ? 'Submit Application' : 'Next'}
-              {step < totalSteps - 1 && <ChevronRight size={16} />}
-            </button>
+              <button
+                onClick={handleNext}
+                disabled={!canProceed() || loading}
+                className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-2.5 rounded-full transition"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    {step === totalSteps - 1 ? 'Submit Application' : 'Next'}
+                    {step < totalSteps - 1 && <ChevronRight size={16} />}
+                  </>
+                )}
+              </button>
           </div>
         ) : (
           <div className="border-t border-gray-100 px-6 py-4 shrink-0 bg-white">

@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Briefcase, FileText,
-  PlusCircle, Users, LogOut
+  PlusCircle, Users, LogOut, ClipboardList
 } from 'lucide-react'
 
 export default function Sidebar({ role }) {
@@ -11,6 +11,7 @@ export default function Sidebar({ role }) {
   const candidateLinks = [
     { to: '/candidate/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/candidate/jobs', label: 'Browse Jobs', icon: Briefcase },
+    { to: '/candidate/applications', label: 'My Applications', icon: ClipboardList },
     { to: '/candidate/resume', label: 'My Resume', icon: FileText },
   ]
 

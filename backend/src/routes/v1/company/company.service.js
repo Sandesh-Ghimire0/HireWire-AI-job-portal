@@ -5,7 +5,7 @@ import { uploadOnCloudinary } from "../../../utils/cloudinary.js";
 
 class CompanyService {
     async registerCompany(companyDetails, logoLocalPath) {
-        const { email, password, name, website, industry, description } = companyDetails;
+        const { email, password, name, website, industry, description, location } = companyDetails;
 
         // 1. Check if user already exists
         const existingUser = await CompanyRepository.findUserByEmail(email);
@@ -33,6 +33,7 @@ class CompanyService {
         const company = await CompanyRepository.createCompany({
             userId: user._id,
             name,
+            location,
             website,
             logo: logoUrl || "",
             industry,

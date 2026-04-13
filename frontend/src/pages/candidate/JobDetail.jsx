@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, MapPin, Briefcase, Clock, ShieldCheck, Layers, Loader2 } from 'lucide-react'
 import Sidebar from '../../components/common/Sidebar'
 import MatchScoreBadge from '../../components/candidate/MatchScoreBadge'
+import EasyApplyModal from '../../components/candidate/EasyApplyModal'
 import { getJobDescription } from '../../api/job'
 import ReactMarkdown from 'react-markdown'
 import { formatDistanceToNow } from 'date-fns'
@@ -14,6 +15,7 @@ export default function JobDetail() {
   const { id } = useParams()
   const [job, setJob] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false)
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -125,16 +127,36 @@ export default function JobDetail() {
                 </div>
               </div>
 
-              <Link
-                to="/candidate/resume"
-                className="block rounded-full bg-[#1A2B4A] px-5 py-3 text-center text-sm font-semibold text-white hover:bg-teal-600"
-              >
-                Update resume
-              </Link>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => setIsApplyModalOpen(true)}
+                  className="w-full rounded-full bg-teal-500 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-teal-600 shadow-md transition-all active:scale-[0.98]"
+                >
+                  Apply Now
+                </button>
+                <Link
+                  to="/candidate/resume"
+                  className="block rounded-full border border-gray-200 bg-white px-5 py-3 text-center text-sm font-semibold text-[#1A2B4A] hover:bg-gray-50 transition-all"
+                >
+                  Update resume
+                </Link>
+              </div>
             </aside>
           </div>
         </div>
       </main>
+
+      {isApplyModalOpen && (
+        <EasyApplyModal
+          job={{
+            _id: job._id,
+            title: job.title,
+            company: job.companyId?.name,
+            location: job.location || 'Kathmandu, Nepal'
+          }}
+          onClose={() => setIsApplyModalOpen(false)}
+        />
+      )}
     </div>
   )
 }
