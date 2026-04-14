@@ -22,6 +22,18 @@ class ApplicationRepository {
             },
         });
     }
+
+    async findByJobId(jobId) {
+        return await Application.find({ jobId }).populate("candidateId").sort({ createdAt: -1 });
+    }
+
+    async updateStatus(id, status) {
+        return await Application.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true, runValidators: true }
+        ).populate("jobId").populate("candidateId");
+    }
 }
 
 export default new ApplicationRepository();

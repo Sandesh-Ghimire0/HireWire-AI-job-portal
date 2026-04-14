@@ -52,4 +52,42 @@ const getApplications = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, applications, "Applications fetched successfully"));
 });
 
-export { applyForJob, getApplications };
+const getJobApplications = asyncHandler(async (req, res) => {
+    const { jobId } = req.params;
+    if (!jobId) {
+        throw new ApiError(400, "Job ID is required");
+    }
+
+    const applications = await ApplicationService.getJobApplications(jobId);
+    return res
+        .status(200)
+        .json(new ApiResponse(200, applications, "Job applications fetched successfully"));
+});
+
+const updateApplicationStatus = asyncHandler(async (req, res) => {
+    const { applicationId } = req.params;
+    const { status } = req.body;
+
+    if (!applicationId || !status) {
+        throw new ApiError(400, "Application ID and status are required");
+    }
+
+    const application = await ApplicationService.updateApplicationStatus(applicationId, status);
+    return res
+        .status(200)
+        .json(new ApiResponse(200, application, "Application status updated successfully"));
+});
+
+const getApplicationById = asyncHandler(async (req, res) => {
+    const { applicationId } = req.params;
+    if (!applicationId) {
+        throw new ApiError(400, "Application ID is required");
+    }
+
+    const application = await ApplicationService.getApplicationById(applicationId);
+    return res
+        .status(200)
+        .json(new ApiResponse(200, application, "Application details fetched successfully"));
+});
+
+export { applyForJob, getApplications, getJobApplications, updateApplicationStatus, getApplicationById };

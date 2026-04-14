@@ -38,6 +38,26 @@ class ApplicationService {
         }
         return await ApplicationRepository.findByCandidateId(candidate._id);
     }
+
+    async getJobApplications(jobId) {
+        return await ApplicationRepository.findByJobId(jobId);
+    }
+
+    async updateApplicationStatus(applicationId, status) {
+        const application = await ApplicationRepository.updateStatus(applicationId, status);
+        if (!application) {
+            throw new ApiError(404, "Application not found");
+        }
+        return application;
+    }
+
+    async getApplicationById(id) {
+        const application = await ApplicationRepository.findById(id);
+        if (!application) {
+            throw new ApiError(404, "Application not found");
+        }
+        return application;
+    }
 }
 
 export default new ApplicationService();

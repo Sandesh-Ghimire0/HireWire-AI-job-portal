@@ -13,6 +13,8 @@ import Applications from './pages/candidate/Applications'
 
 import RecruiterDashboard from './pages/recruiter/Dashboard'
 import PostJob from './pages/recruiter/PostJob'
+import RecruiterJobs from './pages/recruiter/RecruiterJobs'
+import JobApplications from './pages/recruiter/JobApplications'
 import Applicant from './pages/recruiter/Applicant'
 
 function App() {
@@ -35,6 +37,8 @@ function App() {
         {/* Recruiter */}
         <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
         <Route path="/recruiter/post-job" element={<PostJob />} />
+        <Route path="/recruiter/jobs" element={<RecruiterJobs />} />
+        <Route path="/recruiter/jobs/:jobId/applications" element={<JobApplications />} />
         <Route path="/recruiter/applicants/:id" element={<Applicant />} />
       </Routes>
     </BrowserRouter>

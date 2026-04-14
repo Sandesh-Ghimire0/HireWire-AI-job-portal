@@ -17,8 +17,8 @@ export default function Sidebar({ role }) {
 
   const recruiterLinks = [
     { to: '/recruiter/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/recruiter/jobs', label: 'Manage Jobs', icon: Briefcase },
     { to: '/recruiter/post-job', label: 'Post a Job', icon: PlusCircle },
-    { to: '/recruiter/applicants/1', label: 'Applicants', icon: Users },
   ]
 
   const links = role === 'recruiter' ? recruiterLinks : candidateLinks

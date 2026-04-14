@@ -26,6 +26,14 @@ class JobService {
         return job;
     }
 
+    async getRecruiterJobs(userId) {
+        const company = await Company.findOne({ userId });
+        if (!company) {
+            throw new ApiError(404, "Company profile not found for this user");
+        }
+        return await JobRepository.findByCompanyId(company._id);
+    }
+
     async getJobsByCompany(companyId) {
         return await JobRepository.findByCompanyId(companyId);
     }

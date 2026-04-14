@@ -15,4 +15,9 @@ export const getJobDescription = async (jobId) => {
   return response.data
 }
 
+export const getRecruiterJobs = async () => {
+    const response = await api.get('/v1/job/my-jobs')
+    return response.data
+}
+
 
