@@ -40,6 +40,15 @@ class CandidateService {
 
         return { user, candidate };
     }
+
+    async getProfile(userId) {
+        const candidate = await CandidateRepository.findByUserId(userId);
+        if (!candidate) {
+            throw new ApiError(404, "Candidate profile not found");
+        }
+        return candidate;
+    }
 }
+
 
 export default new CandidateService();

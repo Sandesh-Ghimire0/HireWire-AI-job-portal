@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Job } from "./job.model.js";
 
 class JobRepository {
@@ -6,8 +7,42 @@ class JobRepository {
     }
 
     async findByCompanyId(companyId) {
-        // Exclude rawDescription, preprocessedDescription, and markdownDescription for list view
-        return await Job.find({ companyId }).select("-rawDescription -preprocessedDescription -markdownDescription").populate("companyId");
+        return await Job.aggregate([
+            { $match: { companyId: new mongoose.Types.ObjectId(companyId) } },
+            {
+                $lookup: {
+                    from: "applications",
+                    localField: "_id",
+                    foreignField: "jobId",
+                    as: "applications"
+                }
+            },
+            {
+                $addFields: {
+                    applicantCount: { $size: "$applications" }
+                }
+            },
+            {
+                $lookup: {
+                    from: "companies",
+                    localField: "companyId",
+                    foreignField: "_id",
+                    as: "company"
+                }
+            },
+            { $unwind: "$company" },
+            { 
+                $project: { 
+                    applications: 0, 
+                    rawDescription: 0, 
+                    preprocessedDescription: 0, 
+                    markdownDescription: 0,
+                    "company.userId": 0,
+                    "company.description": 0
+                } 
+            },
+            { $sort: { createdAt: -1 } }
+        ]);
     }
 
     async findDescriptionById(id) {
