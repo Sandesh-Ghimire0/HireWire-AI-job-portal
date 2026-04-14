@@ -1,7 +1,5 @@
 import { Link } from 'react-router-dom'
-import Navbar from '../components/common/Navbar'
 import Footer from '../components/common/Footer'
-
 import { BrainCircuit, FileSearch, Trophy, Bell } from 'lucide-react'
 
 const features = [
@@ -19,47 +17,88 @@ const steps = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <div className="min-h-screen flex flex-col bg-white">
 
-      {/* Hero */}
-      <section className="bg-gradient-to-r from-blue-100 via-blue-300 to-blue-500 text-white py-24 px-8 text-center">
-        <h1 className="text-5xl font-bold mb-4 leading-tight">
+      {/* ── Navbar ── */}
+      <nav className="w-full bg-[#1A2B4A] px-8 py-4 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="text-2xl font-bold text-teal-400 tracking-wide">
+          HireWire
+        </Link>
+
+        {/* Right side: nav links + auth buttons */}
+        <div className="flex items-center gap-6">
+          <Link to="/" className="text-sm text-gray-300 hover:text-white transition">Home</Link>
+          <Link to="/candidate/jobs" className="text-sm text-gray-300 hover:text-white transition">Jobs</Link>
+
+          {/* Divider */}
+          <div className="w-px h-5 bg-white/20" />
+
+          <Link
+            to="/login"
+            className="text-sm font-medium text-gray-200 hover:text-white transition"
+          >
+            Log In
+          </Link>
+          <Link
+            to="/register"
+            className="text-sm font-semibold bg-teal-500 hover:bg-teal-400 text-white px-5 py-2 rounded-full transition"
+          >
+            Register
+          </Link>
+        </div>
+      </nav>
+
+      {/* ── Hero ── */}
+      {/* Dark navy background — white text is fully readable */}
+      <section className="bg-[#1A2B4A] text-white py-24 px-8 text-center">
+        {/* Subtle badge */}
+        <span className="inline-block bg-teal-500/20 text-teal-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-6 tracking-wide uppercase">
+          AI-Powered Recruitment
+        </span>
+
+        <h1 className="text-5xl font-bold mb-5 leading-tight">
           Get Hired <span className="text-teal-400">Smarter</span>
         </h1>
-        <p className="text-gray-300 text-lg max-w-xl mx-auto mb-8">
-          HireWire uses AI to match your resume with the right jobs and helps recruiters find the right candidates — instantly.
+        <p className="text-gray-300 text-lg max-w-xl mx-auto mb-10">
+          HireWire uses AI to match your resume with the right jobs and helps
+          recruiters find the right candidates — instantly.
         </p>
-        <div className="flex justify-center gap-4">
-  <Link
-    to="/register"
-    className="border border-white hover:bg-white hover:text-[#3565bd] px-6 py-3 rounded-full font-semibold transition"
-  >
-    Find Jobs
-  </Link>
 
-  <Link
-    to="/register"
-    className="border border-white hover:bg-white hover:text-[#3565bd] px-6 py-3 rounded-full font-semibold transition"
-  >
-    Post a Job
-  </Link>
-</div>
+        {/* CTA Buttons — clearly visible on dark bg */}
+        <div className="flex justify-center gap-4 flex-wrap">
+          <Link
+            to="/register"
+            className="bg-teal-500 hover:bg-teal-400 text-white px-7 py-3 rounded-full font-semibold transition shadow-lg shadow-teal-500/20"
+          >
+            Find Jobs
+          </Link>
+          <Link
+            to="/register"
+            className="border border-white/40 hover:border-white hover:bg-white/10 text-white px-7 py-3 rounded-full font-semibold transition"
+          >
+            Post a Job
+          </Link>
+        </div>
       </section>
 
-      {/* Stats */}
+      {/* ── Stats ── */}
       <section className="bg-teal-600 text-white py-8 px-8">
         <div className="max-w-4xl mx-auto grid grid-cols-3 gap-4 text-center">
-          {[['500+', 'Jobs Listed'], ['AI-Powered', 'Matching Engine'], ['Unbiased', 'Screening']].map(([val, label]) => (
+          {[
+            ['500+', 'Jobs Listed'],
+            ['AI-Powered', 'Matching Engine'],
+            ['Unbiased', 'Screening'],
+          ].map(([val, label]) => (
             <div key={label}>
               <p className="text-3xl font-bold">{val}</p>
-              <p className="text-sm text-teal-100">{label}</p>
+              <p className="text-sm text-teal-100 mt-1">{label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* How it works */}
+      {/* ── How it Works ── */}
       <section className="py-20 px-8 bg-gray-50">
         <h2 className="text-3xl font-bold text-center text-[#1A2B4A] mb-12">How It Works</h2>
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -75,7 +114,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* ── Features ── */}
       <section className="py-20 px-8">
         <h2 className="text-3xl font-bold text-center text-[#1A2B4A] mb-12">Why HireWire?</h2>
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
