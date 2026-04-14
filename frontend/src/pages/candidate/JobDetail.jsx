@@ -7,6 +7,7 @@ import EasyApplyModal from '../../components/candidate/EasyApplyModal'
 import { getJobDescription } from '../../api/job'
 import ReactMarkdown from 'react-markdown'
 import { formatDistanceToNow } from 'date-fns'
+import PreSubmissionFeedback from '../../components/candidate/PreSubmissionFeedback'
 
 
 
@@ -100,46 +101,27 @@ export default function JobDetail() {
 
 
 
-            <aside className="rounded-3xl bg-white p-8 shadow-sm border border-gray-100 space-y-6">
-              <div className="space-y-2">
-                <h2 className="text-lg font-semibold text-[#1A2B4A]">Why this role matters</h2>
-                <p className="text-gray-600">Join a team that values strong UI craftsmanship and a meaningful user experience.</p>
-              </div>
 
-              <div className="rounded-3xl bg-teal-50 p-6">
-                <div className="flex items-center gap-3 text-teal-700">
-                  <ShieldCheck size={18} />
-                  <span className="font-semibold">Application match</span>
-                </div>
-                <p className="mt-3 text-gray-700">Your resume match score is <strong>{job.matchScore}%</strong>. Keep your profile updated to improve this score.</p>
-              </div>
+            <aside className="rounded-3xl bg-white p-8 shadow-sm border border-gray-100 space-y-8 h-fit lg:sticky lg:top-8 overflow-y-auto max-h-[calc(100vh-4rem)]">
+              {/* Pre-Submission Feedback Section */}
+              <PreSubmissionFeedback />
 
-              <div className="rounded-3xl bg-slate-50 p-6">
-                <div className="flex items-center gap-2 text-slate-700 font-medium mb-3">
-                  <Layers size={18} /> Preferred skills
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {/* {job.skills.map((skill) => (
-                    <span key={skill} className="rounded-full bg-white px-3 py-2 text-xs font-medium text-slate-700 border border-slate-200">
-                      {skill}
-                    </span>
-                  ))} */}
-                </div>
-              </div>
+              <div className="border-t border-gray-100 pt-8 space-y-6">
 
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={() => setIsApplyModalOpen(true)}
-                  className="w-full rounded-full bg-teal-500 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-teal-600 shadow-md transition-all active:scale-[0.98]"
-                >
-                  Apply Now
-                </button>
-                <Link
-                  to="/candidate/resume"
-                  className="block rounded-full border border-gray-200 bg-white px-5 py-3 text-center text-sm font-semibold text-[#1A2B4A] hover:bg-gray-50 transition-all"
-                >
-                  Update resume
-                </Link>
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => setIsApplyModalOpen(true)}
+                    className="w-full rounded-full bg-teal-500 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-teal-600 shadow-md transition-all active:scale-[0.98]"
+                  >
+                    Apply Now
+                  </button>
+                  <Link
+                    to="/candidate/resume"
+                    className="block rounded-full border border-gray-200 bg-white px-5 py-3 text-center text-sm font-semibold text-[#1A2B4A] hover:bg-gray-50 transition-all"
+                  >
+                    Update resume
+                  </Link>
+                </div>
               </div>
             </aside>
           </div>
