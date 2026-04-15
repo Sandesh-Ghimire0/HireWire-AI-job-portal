@@ -17,6 +17,14 @@ const postJob = asyncHandler(async (req, res) => {
     );
 });
 
+const getRecruiterJobs = asyncHandler(async (req, res) => {
+    const jobs = await JobService.getRecruiterJobs(req.user._id);
+
+    return res.status(200).json(
+        new ApiResponse(200, jobs, "Recruiter's jobs fetched successfully")
+    );
+});
+
 const getJobsByCompany = asyncHandler(async (req, res) => {
     const { companyId } = req.params;
 
@@ -53,4 +61,4 @@ const getAllJobs = asyncHandler(async (req, res) => {
     );
 });
 
-export { postJob, getJobsByCompany, getJobDescription, getAllJobs };
+export { postJob, getRecruiterJobs, getJobsByCompany, getJobDescription, getAllJobs };

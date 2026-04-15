@@ -9,9 +9,12 @@ import CandidateDashboard from './pages/candidate/Dashboard'
 import Jobs from './pages/candidate/Jobs'
 import JobDetail from './pages/candidate/JobDetail'
 import Resume from './pages/candidate/Resume'
+import Applications from './pages/candidate/Applications'
 
 import RecruiterDashboard from './pages/recruiter/Dashboard'
 import PostJob from './pages/recruiter/PostJob'
+import RecruiterJobs from './pages/recruiter/RecruiterJobs'
+import JobApplications from './pages/recruiter/JobApplications'
 import Applicant from './pages/recruiter/Applicant'
 
 function App() {
@@ -28,11 +31,14 @@ function App() {
         <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
         <Route path="/candidate/jobs" element={<Jobs />} />
         <Route path="/candidate/jobs/:id" element={<JobDetail />} />
+        <Route path="/candidate/applications" element={<Applications />} />
         <Route path="/candidate/resume" element={<Resume />} />
 
         {/* Recruiter */}
         <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
         <Route path="/recruiter/post-job" element={<PostJob />} />
+        <Route path="/recruiter/jobs" element={<RecruiterJobs />} />
+        <Route path="/recruiter/jobs/:jobId/applications" element={<JobApplications />} />
         <Route path="/recruiter/applicants/:id" element={<Applicant />} />
       </Routes>
     </BrowserRouter>

@@ -4,9 +4,9 @@ import { ApiResponse } from "../../../utils/ApiResponse.js";
 import { ApiError } from "../../../utils/ApiError.js";
 
 const registerCompany = asyncHandler(async (req, res) => {
-    const { email, password, name } = req.body;
+    const { email, password, name, location } = req.body;
 
-    if (!email || !password || !name) {
+    if (!email || !password || !name || !location) {
         throw new ApiError(400, "Email, password and company name are required");
     }
 

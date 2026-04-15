@@ -39,7 +39,7 @@ export default function CandidateDashboard() {
 
         {/* Top row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <AtsScore score={74} />
+          <AtsScore score={70} />
 
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 col-span-2">
             <h3 className="font-semibold text-[#1A2B4A] mb-4">Skill Analysis</h3>

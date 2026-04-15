@@ -1,9 +1,12 @@
-import express from "express";
-import { registerCandidate } from "./candidate.controller.js";
+import { registerCandidate, getProfile } from "./candidate.controller.js";
 import { upload } from "../../../middlewares/multer.middleware.js";
+import { verifyJWT } from "../../../middlewares/auth.middleware.js";
+import { Router } from "express";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/register", upload.single("cv"), registerCandidate);
+router.get("/profile", verifyJWT, getProfile);
 
 export default router;
+
