@@ -32,6 +32,28 @@ export default function Jobs() {
     )
   })
 
+  // derive a numeric score for each job (prefer ATS score if present, otherwise matchScore)
+  const jobsWithScore = filteredJobs.map((job) => ({
+    ...job,
+    _derivedScore: job.atsScore ?? job.matchScore ?? 0,
+  }))
+
+  // Recommended: jobs with good score (>=60) sorted desc; fallback to top 4 by score
+  let recommendedJobs = jobsWithScore
+    .filter((j) => j._derivedScore >= 60)
+    .sort((a, b) => b._derivedScore - a._derivedScore)
+
+  if (recommendedJobs.length === 0) {
+    recommendedJobs = jobsWithScore
+      .slice()
+      .sort((a, b) => b._derivedScore - a._derivedScore)
+      .slice(0, 4)
+  }
+
+  // All jobs excluding those already shown in recommended (by _id)
+  const recommendedIds = new Set(recommendedJobs.map((j) => j._id))
+  const allJobs = jobsWithScore.filter((j) => !recommendedIds.has(j._id))
+
   if (loading) {
     return (
       <div className="flex min-h-screen bg-gray-50">
@@ -67,16 +89,33 @@ export default function Jobs() {
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {filteredJobs.map((job) => (
-            <JobCard key={job._id} job={job} />
-          ))}
-          {filteredJobs.length === 0 && (
-            <div className="col-span-full rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-gray-500">
-              No jobs matched your search. Try another keyword.
+        {/* Recommended jobs */}
+        {recommendedJobs.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold text-[#1A2B4A] mb-4">Recommended for you</h2>
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {recommendedJobs.map((job) => (
+                <JobCard key={job._id} job={job} />
+              ))}
             </div>
-          )}
-        </div>
+          </section>
+        )}
+
+        {/* All jobs */}
+        <section>
+          <h2 className="text-xl font-semibold text-[#1A2B4A] mb-4">All jobs</h2>
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {allJobs.map((job) => (
+              <JobCard key={job._id} job={job} />
+            ))}
+
+            {jobsWithScore.length === 0 && (
+              <div className="col-span-full rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-gray-500">
+                No jobs matched your search. Try another keyword.
+              </div>
+            )}
+          </div>
+        </section>
       </main>
     </div>
   )

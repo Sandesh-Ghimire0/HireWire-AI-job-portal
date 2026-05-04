@@ -155,12 +155,12 @@ function StepResume({ data, onChange, existingCv }) {
       {/* Resume Upload / Display */}
       <div className="flex flex-col gap-1">
         <label className="text-xs font-medium text-gray-500">Resume (PDF) *</label>
-        
+
         {existingCv && !data.file ? (
           <div className="flex flex-col gap-3">
-             <a 
-              href={existingCv} 
-              target="_blank" 
+            <a
+              href={existingCv}
+              target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-4 border border-teal-200 bg-teal-50 rounded-xl hover:bg-teal-100 transition group"
             >
@@ -173,7 +173,7 @@ function StepResume({ data, onChange, existingCv }) {
               </div>
               <ChevronRight size={18} className="text-teal-400" />
             </a>
-            
+
             {/* <label className="text-xs font-medium text-gray-400 text-center">OR</label>
             
             <label className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-gray-50 transition">
@@ -263,7 +263,7 @@ function ProgressBar({ current, total }) {
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300
               ${i < current ? 'bg-teal-500 text-white' :
                 i === current ? 'bg-[#1A2B4A] text-white ring-2 ring-teal-400 ring-offset-1' :
-                'bg-gray-200 text-gray-400'}`}
+                  'bg-gray-200 text-gray-400'}`}
             >
               {i < current ? '✓' : i + 1}
             </div>
@@ -329,7 +329,7 @@ export default function EasyApplyModal({ job, onClose }) {
   const handleSubmit = async () => {
     setLoading(true)
     setError(null)
-    
+
     try {
       const payload = {
         jobId: job?._id || jobIdFromUrl,
@@ -412,23 +412,23 @@ export default function EasyApplyModal({ job, onClose }) {
               <ChevronLeft size={16} /> Back
             </button>
             <span className="text-xs text-gray-300">Step {step + 1} of {totalSteps}</span>
-              <button
-                onClick={handleNext}
-                disabled={!canProceed() || loading}
-                className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-2.5 rounded-full transition"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    {step === totalSteps - 1 ? 'Submit Application' : 'Next'}
-                    {step < totalSteps - 1 && <ChevronRight size={16} />}
-                  </>
-                )}
-              </button>
+            <button
+              onClick={handleNext}
+              disabled={!canProceed() || loading}
+              className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-2.5 rounded-full transition"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  {step === totalSteps - 1 ? 'Submit Application' : 'Next'}
+                  {step < totalSteps - 1 && <ChevronRight size={16} />}
+                </>
+              )}
+            </button>
           </div>
         ) : (
           <div className="border-t border-gray-100 px-6 py-4 shrink-0 bg-white">
