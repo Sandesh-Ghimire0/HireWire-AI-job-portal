@@ -29,7 +29,7 @@ export default function JobCard({ job }) {
             <p className="text-sm text-gray-500 font-medium">{company.name || 'Unknown Company'}</p>
           </div>
         </div>
-        <MatchScoreBadge score={job.matchScore || 0} />
+        <MatchScoreBadge score={job.atsScore ?? job.matchScore ?? 0} />
       </div>
 
       <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-6">
