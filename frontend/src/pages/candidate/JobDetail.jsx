@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, MapPin, Briefcase, Clock, ShieldCheck, Layers, Loader2 } from 'lucide-react'
 import Sidebar from '../../components/common/Sidebar'
-import MatchScoreBadge from '../../components/candidate/MatchScoreBadge'
 import EasyApplyModal from '../../components/candidate/EasyApplyModal'
 import { getJobDescription } from '../../api/job'
 import ReactMarkdown from 'react-markdown'
@@ -76,7 +75,6 @@ export default function JobDetail() {
               <h1 className="mt-4 text-3xl font-bold text-[#1A2B4A]">{job.title}</h1>
               <p className="text-gray-500 mt-2">{job.companyId?.name} · {job.salaryRange || 'N/A'} · {job.type}</p>
             </div>
-            <MatchScoreBadge score={job.matchScore || 0} />
           </div>
 
           <div className="grid items-start gap-6 lg:grid-cols-[1.6fr_1fr]">
