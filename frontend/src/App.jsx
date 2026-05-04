@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 
 import Landing from './pages/Landing'
@@ -6,7 +6,8 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 
 import CandidateDashboard from './pages/candidate/Dashboard'
-import Jobs from './pages/candidate/Jobs'
+import AllJobs from './pages/candidate/AllJobs'
+import RecommendedJobs from './pages/candidate/RecommendedJobs'
 import JobDetail from './pages/candidate/JobDetail'
 import Resume from './pages/candidate/Resume'
 import Applications from './pages/candidate/Applications'
@@ -29,7 +30,9 @@ function App() {
 
         {/* Candidate */}
         <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
-        <Route path="/candidate/jobs" element={<Jobs />} />
+        <Route path="/candidate/jobs" element={<Navigate to="/candidate/jobs/all" replace />} />
+        <Route path="/candidate/jobs/all" element={<AllJobs />} />
+        <Route path="/candidate/jobs/recommended" element={<RecommendedJobs />} />
         <Route path="/candidate/jobs/:id" element={<JobDetail />} />
         <Route path="/candidate/applications" element={<Applications />} />
         <Route path="/candidate/resume" element={<Resume />} />

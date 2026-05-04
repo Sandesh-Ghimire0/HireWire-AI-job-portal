@@ -1,18 +1,26 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Briefcase, FileText,
-  PlusCircle, Users, LogOut, ClipboardList
+  PlusCircle, LogOut, ClipboardList, ChevronDown
 } from 'lucide-react'
 
 export default function Sidebar({ role }) {
   const location = useLocation()
   const navigate = useNavigate()
+  const isBrowseActive =
+    location.pathname === '/candidate/jobs' ||
+    location.pathname === '/candidate/jobs/all' ||
+    location.pathname === '/candidate/jobs/recommended'
 
-  const candidateLinks = [
+  const candidateTopLinks = [
     { to: '/candidate/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/candidate/jobs', label: 'Browse Jobs', icon: Briefcase },
     { to: '/candidate/applications', label: 'My Applications', icon: ClipboardList },
     { to: '/candidate/resume', label: 'My Resume', icon: FileText },
+  ]
+
+  const browseJobLinks = [
+    { to: '/candidate/jobs/recommended', label: 'Recommended' },
+    { to: '/candidate/jobs/all', label: 'All' },
   ]
 
   const recruiterLinks = [
@@ -21,7 +29,7 @@ export default function Sidebar({ role }) {
     { to: '/recruiter/post-job', label: 'Post a Job', icon: PlusCircle },
   ]
 
-  const links = role === 'recruiter' ? recruiterLinks : candidateLinks
+  const links = role === 'recruiter' ? recruiterLinks : candidateTopLinks
 
   const handleLogout = () => {
     // Clear auth state here (localStorage, zustand store, etc.)
@@ -50,6 +58,33 @@ export default function Sidebar({ role }) {
             {label}
           </Link>
         ))}
+
+        {role === 'candidate' && (
+          <details
+            open={isBrowseActive}
+            className={`rounded-lg ${isBrowseActive ? 'bg-teal-600/20' : ''}`}
+          >
+            <summary className={`list-none flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-medium cursor-pointer transition ${isBrowseActive ? 'text-white' : 'hover:bg-white/10 text-gray-300'}`}>
+              <span className="inline-flex items-center gap-3">
+                <Briefcase size={18} />
+                Browse Jobs
+              </span>
+              <ChevronDown size={16} className="opacity-80" />
+            </summary>
+
+            <div className="mt-1 mb-2 px-2">
+              {browseJobLinks.map(({ to, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`block rounded-md px-3 py-2 text-sm transition ${location.pathname === to ? 'bg-teal-600 text-white' : 'text-gray-300 hover:bg-white/10'}`}
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </details>
+        )}
       </nav>
 
       {/* Logout Button — pinned to bottom */}

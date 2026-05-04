@@ -3,7 +3,7 @@ import { MapPin, Clock, Briefcase, DollarSign, Layers } from 'lucide-react'
 import MatchScoreBadge from './MatchScoreBadge'
 import { formatDistanceToNow } from 'date-fns'
 
-export default function JobCard({ job }) {
+export default function JobCard({ job, showMatchScore = true }) {
   const company = job.companyId || {}
 
   return (
@@ -29,7 +29,7 @@ export default function JobCard({ job }) {
             <p className="text-sm text-gray-500 font-medium">{company.name || 'Unknown Company'}</p>
           </div>
         </div>
-        <MatchScoreBadge score={job.atsScore ?? job.matchScore ?? 0} />
+        {showMatchScore && <MatchScoreBadge score={job.atsScore ?? job.matchScore ?? 0} />}
       </div>
 
       <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-6">
