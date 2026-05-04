@@ -1,4 +1,5 @@
 import JobService from "./job.service.js";
+import CandidateService from "../candidate/candidate.service.js";
 import { asyncHandler } from "../../../utils/asyncHandler.js";
 import { ApiResponse } from "../../../utils/ApiResponse.js";
 import { ApiError } from "../../../utils/ApiError.js";
@@ -61,4 +62,41 @@ const getAllJobs = asyncHandler(async (req, res) => {
     );
 });
 
-export { postJob, getRecruiterJobs, getJobsByCompany, getJobDescription, getAllJobs };
+const getRecommendedJobs = asyncHandler(async (req, res) => {
+    // 1. Get the candidate profile for the logged-in user
+    const candidate = await CandidateService.getProfile(req.user._id);
+    
+    if (!candidate) {
+        throw new ApiError(404, "Candidate profile not found");
+    }
+
+    const candidate_id = candidate._id.toString();
+
+    try {
+        const response = await fetch(`http://localhost:8000/match-jobs/${candidate_id}`);
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new ApiError(response.status, errorData.detail || "Failed to fetch recommendations from the recommendation server");
+        }
+
+        const data = await response.json();
+
+        if (!data.matches || !Array.isArray(data.matches)) {
+            throw new ApiError(500, "Invalid response format from recommendation server");
+        }
+
+        const jobsWithScores = await JobService.getRecommendedJobs(data.matches);
+
+        return res.status(200).json(
+            new ApiResponse(200, jobsWithScores, "Recommended jobs fetched successfully")
+        );
+    } catch (error) {
+        if (error instanceof ApiError) throw error;
+        
+        // Handle connection errors to the recommendation server
+        throw new ApiError(500, `Recommendation server error: ${error.message}`);
+    }
+});
+
+export { postJob, getRecruiterJobs, getJobsByCompany, getJobDescription, getAllJobs, getRecommendedJobs };

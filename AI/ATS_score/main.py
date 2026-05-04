@@ -106,7 +106,7 @@ def bert_rerank(resume, jobs, top_indices):
 # ─────────────────────────────────────────────
 
 @app.get("/match-jobs/{candidate_id}")
-def match_jobs(candidate_id: str, top_k: int = 15):
+def match_jobs(candidate_id: str, top_k: int = 5):
     """
     Returns ranked list of job_idand match_score for a given candidate.
 

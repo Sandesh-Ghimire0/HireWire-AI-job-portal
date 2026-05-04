@@ -49,6 +49,24 @@ class JobService {
     async getAllJobs() {
         return await JobRepository.findAll();
     }
+
+    async getRecommendedJobs(recommendations) {
+        const jobsWithScores = await Promise.all(
+            recommendations.map(async (rec) => {
+                const job = await JobRepository.findById(rec.job_id);
+                if (job) {
+                    return {
+                        ...job.toObject(),
+                        matchScore: rec.match_score
+                    };
+                }
+                return null;
+            })
+        );
+
+        // Filter out any null values (jobs that weren't found)
+        return jobsWithScores.filter(job => job !== null);
+    }
 }
 
 export default new JobService();

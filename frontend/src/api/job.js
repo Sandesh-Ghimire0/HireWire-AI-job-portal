@@ -20,4 +20,7 @@ export const getRecruiterJobs = async () => {
     return response.data
 }
 
-
+export const getRecommendedJobs = async () => {
+    const response = await api.get('/v1/job/recommend')
+    return response.data
+}

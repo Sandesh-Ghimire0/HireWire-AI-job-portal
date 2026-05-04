@@ -1,9 +1,10 @@
 import express from "express";
-import { postJob, getRecruiterJobs, getJobsByCompany, getJobDescription, getAllJobs } from "./job.controller.js";
+import { postJob, getRecruiterJobs, getJobsByCompany, getJobDescription, getAllJobs, getRecommendedJobs } from "./job.controller.js";
 import { verifyJWT, authorizeRoles } from "../../../middlewares/auth.middleware.js";
 
 const router = express.Router();
 router.get("/",verifyJWT, getAllJobs);
+router.get("/recommend", verifyJWT, getRecommendedJobs);
 router.post("/", verifyJWT, authorizeRoles("COMPANY"), postJob);
 
 
