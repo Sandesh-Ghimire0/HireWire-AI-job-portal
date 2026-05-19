@@ -99,4 +99,31 @@ const getRecommendedJobs = asyncHandler(async (req, res) => {
     }
 });
 
-export { postJob, getRecruiterJobs, getJobsByCompany, getJobDescription, getAllJobs, getRecommendedJobs };
+const getJobFeedback = asyncHandler(async (req, res) => {
+    const { jobId } = req.params;
+
+    if (!jobId) {
+        throw new ApiError(400, "Job ID is required");
+    }
+
+    // 1. Get candidate profile
+    const candidate = await CandidateService.getProfile(req.user._id);
+    if (!candidate || !candidate.resumeText) {
+        throw new ApiError(400, "Please upload your resume to receive AI feedback on this job.");
+    }
+
+    // 2. Get job
+    const job = await JobService.getJobDescription(jobId);
+    if (!job) {
+        throw new ApiError(404, "Job not found");
+    }
+
+    // 3. Generate feedback using OpenAI
+    const feedback = await JobService.generateJobFeedback(candidate.resumeText, job);
+
+    return res.status(200).json(
+        new ApiResponse(200, feedback, "Job feedback generated successfully")
+    );
+});
+
+export { postJob, getRecruiterJobs, getJobsByCompany, getJobDescription, getAllJobs, getRecommendedJobs, getJobFeedback };

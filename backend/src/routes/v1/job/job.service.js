@@ -1,7 +1,7 @@
 import JobRepository from "./job.repository.js";
 import { Company } from "../company/company.model.js";
 import { ApiError } from "../../../utils/ApiError.js";
-import { preprocessJobDescription } from "../../../utils/openAI.js";
+import { preprocessJobDescription, generateJobFeedback } from "../../../utils/openAI.js";
 
 class JobService {
     async postJob(userId, jobDetails) {
@@ -66,6 +66,12 @@ class JobService {
 
         // Filter out any null values (jobs that weren't found)
         return jobsWithScores.filter(job => job !== null);
+    }
+
+    async generateJobFeedback(resumeText, job) {
+        const description = job.markdownDescription || job.rawDescription || "";
+        const title = job.title || "";
+        return await generateJobFeedback(resumeText, title, description);
     }
 }
 

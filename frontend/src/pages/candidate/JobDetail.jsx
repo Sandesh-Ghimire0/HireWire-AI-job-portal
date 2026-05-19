@@ -102,7 +102,7 @@ export default function JobDetail() {
 
             <aside className="rounded-3xl bg-white p-8 shadow-sm border border-gray-100 space-y-8 h-fit lg:sticky lg:top-8 overflow-y-auto max-h-[calc(100vh-4rem)]">
               {/* Pre-Submission Feedback Section */}
-              <PreSubmissionFeedback />
+              <PreSubmissionFeedback jobId={job._id} />
 
               <div className="border-t border-gray-100 pt-8 space-y-6">
 

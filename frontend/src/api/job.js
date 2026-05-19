@@ -24,3 +24,8 @@ export const getRecommendedJobs = async () => {
     const response = await api.get('/v1/job/recommend')
     return response.data
 }
+
+export const getJobFeedback = async (jobId) => {
+  const response = await api.get(`/v1/job/feedback/${jobId}`)
+  return response.data
+}
