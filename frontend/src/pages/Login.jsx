@@ -117,7 +117,7 @@ export default function Login() {
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="•••••••••"
+                  placeholder="••••••••••"
                   value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
                   className="w-full pl-10 pr-12 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
