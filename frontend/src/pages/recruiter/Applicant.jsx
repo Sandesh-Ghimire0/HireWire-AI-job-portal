@@ -39,6 +39,8 @@ export default function Applicant() {
     }
   }
 
+  console.log(applicant)
+
   if (loading) {
     return (
       <div className="flex min-h-screen bg-gray-50 uppercase tracking-tighter">
@@ -168,13 +170,22 @@ export default function Applicant() {
             </div>
 
             <div className="rounded-3xl bg-white p-8 shadow-sm border border-gray-100">
-              <h4 className="font-semibold text-slate-900 mb-4">Download Resume</h4>
-              <button 
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#1A2B4A] px-4 py-3 text-sm font-semibold text-white hover:bg-teal-600 transition"
-                onClick={() => toast.error('Resume download feature is not yet connected to backend storage.')}
-              >
-                <Download size={18} /> Download CV
-              </button>
+              <h4 className="font-semibold text-slate-900 mb-4">Resume</h4>
+              {applicant.candidateId?.cvLink ? (
+                  <button 
+                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#1A2B4A] px-4 py-3 text-sm font-semibold text-white hover:bg-teal-600 transition"
+                    onClick={() => window.open(applicant.candidateId.cvLink, '_blank', 'noopener,noreferrer')}
+                  >
+                    View CV
+                  </button>
+              ) : (
+                  <button 
+                    disabled
+                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-400 transition cursor-not-allowed"
+                  >
+                    No CV Uploaded
+                  </button>
+              )}
             </div>
           </aside>
         </div>

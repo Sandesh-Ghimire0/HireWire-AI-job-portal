@@ -12,6 +12,10 @@ const applicationSchema = new Schema(
             ref: "Candidate",
             required: [true, "Candidate ID is required"],
         },
+        matchScoreId: {
+            type: Schema.Types.ObjectId,
+            ref: "MatchScore",
+        },
         status: {
             type: String,
             enum: ["PENDING", "REVIEWING", "ACCEPTED", "REJECTED"],

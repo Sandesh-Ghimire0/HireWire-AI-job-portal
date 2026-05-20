@@ -10,7 +10,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 import os
-load_dotenv()  # Load environment variables from .env file
+from datetime import datetime
+
+load_dotenv()
 
 nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
@@ -24,15 +26,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-uri=os.getenv("MONGO_URI")  
+uri = os.getenv("MONGO_URI")
 client = MongoClient(uri)
 
 db = client["hirewire"]
 jobs_collection = db["jobs"]
-users_collection = db["candidates"]  
+users_collection = db["candidates"]
+matchscores_collection = db["matchscores"]
 
-# Load model once at startup
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
@@ -53,25 +54,23 @@ def fetch_jobs():
 
 
 def fetch_resume(candidate_id: str) -> str:
-    """Fetch resume text from users collection using candidate_id (_id)."""
     try:
         object_id = ObjectId(candidate_id)
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid candidate_id format")
 
     user = users_collection.find_one({"_id": object_id})
-
     if not user:
         raise HTTPException(status_code=404, detail=f"Candidate '{candidate_id}' not found")
 
-    resume_text = user.get("resumeText")  # adjust field name if different in your DB
+    resume_text = user.get("resumeText")
     if not resume_text:
         raise HTTPException(status_code=404, detail="Resume text not found for this candidate")
 
     return resume_text
 
 
-def tfidf_filter(resume, jobs, top_k=15):
+def tfidf_filter(resume, jobs, candidate_id: str, top_k=15):
     job_texts = [job["rawDescription"] for job in jobs]
     documents = [resume] + job_texts
 
@@ -82,6 +81,32 @@ def tfidf_filter(resume, jobs, top_k=15):
     job_vecs = tfidf_matrix[1:]
 
     similarities = cosine_similarity(resume_vec, job_vecs)[0]
+    print("Similarities:", similarities)
+
+    # Save all TF-IDF scores to matchscores_collection
+    tfidf_docs = []
+    for i, job in enumerate(jobs):
+        tfidf_docs.append({
+            "candidateId": candidate_id,
+            "jobId": str(job.get("_id")),
+            "matchScore": round(float(similarities[i] * 100), 2),
+            "method": "tfidf",
+            "createdAt": datetime.utcnow()
+        })
+
+    if tfidf_docs:
+        # Upsert each score so re-runs don't create duplicates
+        for doc in tfidf_docs:
+            matchscores_collection.update_one(
+                {
+                    "candidateId": doc["candidateId"],
+                    "jobId": doc["jobId"],
+                    "method": "tfidf"
+                },
+                {"$set": doc},
+                upsert=True
+            )
+
     top_indices = similarities.argsort()[::-1][:top_k]
     return top_indices
 
@@ -107,14 +132,7 @@ def bert_rerank(resume, jobs, top_indices):
 
 @app.get("/match-jobs/{candidate_id}")
 def match_jobs(candidate_id: str, top_k: int = 5):
-    """
-    Returns ranked list of job_idand match_score for a given candidate.
-
-    - candidate_id: MongoDB _id of the candidate/user
-    - top_k: number of jobs to consider in TF-IDF stage (default 15)
-    """
-
-    # Step 1: Fetch resume text using candidate_id
+    # Step 1: Fetch resume
     resume_text = fetch_resume(candidate_id)
 
     # Step 2: Fetch all jobs
@@ -127,8 +145,8 @@ def match_jobs(candidate_id: str, top_k: int = 5):
     for job in jobs:
         job["clean_description"] = preprocess(job["rawDescription"])
 
-    # Step 4: TF-IDF coarse filter
-    top_indices = tfidf_filter(resume_clean, jobs, top_k)
+    # Step 4: TF-IDF filter — scores saved to DB here
+    top_indices = tfidf_filter(resume_clean, jobs, candidate_id, top_k)
 
     # Step 5: BERT re-ranking
     bert_results = bert_rerank(resume_clean, jobs, top_indices)
@@ -138,7 +156,7 @@ def match_jobs(candidate_id: str, top_k: int = 5):
     for idx, score in bert_results:
         job = jobs[idx]
         results.append({
-            "job_id": str(job.get("_id")),   # convert ObjectId → string for JSON
+            "job_id": str(job.get("_id")),
             "match_score": score
         })
 
@@ -147,6 +165,7 @@ def match_jobs(candidate_id: str, top_k: int = 5):
         "total_matches": len(results),
         "matches": results
     }
+
 
 if __name__ == "__main__":
     import uvicorn

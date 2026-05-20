@@ -73,68 +73,90 @@ export default function JobApplications() {
             <p className="text-gray-500">Applications will appear here once candidates start applying.</p>
           </div>
         ) : (
-          <div className="grid gap-6">
-            {applications.map((app) => (
-              <div
-                key={app._id}
-                className="rounded-3xl bg-white p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-              >
-                <div className="flex flex-col lg:flex-row gap-6 lg:items-center lg:justify-between">
-                  <div className="flex items-start gap-4 flex-1">
-                    <div className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
-                      <User size={28} />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <Link to={`/recruiter/applicants/${app._id}`} className="text-lg font-bold text-[#1A2B4A] hover:text-teal-600 transition-colors">
-                            {app.name}
-                        </Link>
-                        <span className={`rounded-full px-3 py-0.5 text-xs font-semibold border ${getStatusStyle(app.status)}`}>
-                          {app.status}
-                        </span>
+          <div className="overflow-x-auto rounded-3xl bg-white shadow-sm border border-gray-100">
+            <table className="w-full text-left text-sm text-gray-600">
+              <thead className="bg-slate-50 border-b border-gray-100 text-xs uppercase text-gray-500 tracking-wider">
+                <tr>
+                  <th scope="col" className="px-6 py-5 font-semibold text-center w-16">Rank</th>
+                  <th scope="col" className="px-6 py-5 font-semibold">Candidate</th>
+                  <th scope="col" className="px-6 py-5 font-semibold">Contact</th>
+                  <th scope="col" className="px-6 py-5 font-semibold">Match Score</th>
+                  <th scope="col" className="px-6 py-5 font-semibold">Applied</th>
+                  <th scope="col" className="px-6 py-5 font-semibold">Status</th>
+                  <th scope="col" className="px-6 py-5 font-semibold text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {applications.map((app, index) => (
+                  <tr key={app._id} className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex h-8 w-8 mx-auto items-center justify-center rounded-full bg-teal-50 text-sm font-bold text-teal-600 border border-teal-100 group-hover:bg-teal-500 group-hover:text-white transition-colors">
+                        {index + 1}
                       </div>
-                      <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-sm text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <Mail size={14} className="text-teal-500" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
+                          <User size={20} />
+                        </div>
+                        <Link to={`/recruiter/applicants/${app._id}`} className="font-bold text-[#1A2B4A] hover:text-teal-600 transition-colors">
+                          {app.name}
+                        </Link>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-col gap-1.5 text-xs">
+                        <div className="flex items-center gap-2 text-gray-500">
+                          <Mail size={13} className="text-teal-500" />
                           {app.email}
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Phone size={14} className="text-teal-500" />
+                        <div className="flex items-center gap-2 text-gray-500">
+                          <Phone size={13} className="text-teal-500" />
                           {app.phone}
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Calendar size={14} className="text-teal-500" />
-                          Applied on {new Date(app.createdAt).toLocaleDateString()}
-                        </div>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-3 border-t lg:border-t-0 pt-4 lg:pt-0">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider w-full lg:w-auto mb-2 lg:mb-0 lg:mr-2">
-                        Update Status:
-                    </span>
-                    <select
-                      value={app.status}
-                      onChange={(e) => handleStatusUpdate(app._id, e.target.value)}
-                      className="rounded-xl border border-gray-200 bg-slate-50 px-4 py-2 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 cursor-pointer"
-                    >
-                      <option value="PENDING">Pending</option>
-                      <option value="REVIEWING">Reviewing</option>
-                      <option value="ACCEPTED">Accepted</option>
-                      <option value="REJECTED">Rejected</option>
-                    </select>
-                    
-                    <Link 
-                        to={`/recruiter/applicants/${app._id}`}
-                        className="rounded-xl bg-[#1A2B4A] px-5 py-2 text-sm font-semibold text-white hover:bg-teal-600 transition-colors"
-                    >
-                        View Profile
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {app.matchScoreData ? (
+                        <span className="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700 border border-indigo-100">
+                          {app.matchScoreData.matchScore}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 text-xs font-medium">N/A</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-gray-500">
+                      {new Date(app.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold border tracking-wide ${getStatusStyle(app.status)}`}>
+                        {app.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        <select
+                          value={app.status}
+                          onChange={(e) => handleStatusUpdate(app._id, e.target.value)}
+                          className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-600 outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 cursor-pointer shadow-sm hover:border-gray-300 transition-colors"
+                        >
+                          <option value="PENDING">Pending</option>
+                          <option value="REVIEWING">Reviewing</option>
+                          <option value="ACCEPTED">Accepted</option>
+                          <option value="REJECTED">Rejected</option>
+                        </select>
+                        <Link 
+                          to={`/recruiter/applicants/${app._id}`}
+                          className="rounded-xl bg-[#1A2B4A] px-4 py-1.5 text-xs font-bold text-white hover:bg-teal-600 shadow-sm transition-colors"
+                        >
+                          View
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </main>
